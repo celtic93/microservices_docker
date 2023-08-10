@@ -14,3 +14,16 @@ setup:
 output:
   elasticsearch:
     hosts: ["http://elasticsearch:9200"]
+processors:
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+            var msg = event.Get('msg');
+            var regex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+            if (msg) {
+              msg = msg.replace(regex, 'MASKED');
+              event.Put('msg',msg);
+            }
+        }
+      tag_on_exception: true
